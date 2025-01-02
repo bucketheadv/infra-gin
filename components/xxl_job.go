@@ -39,7 +39,7 @@ type XxlJobClient struct {
 	Conf     XxlJobConf
 }
 
-func (p *XxlJobClient) Init() {
+func (p *XxlJobClient) init() {
 	if !p.Enabled {
 		return
 	}
@@ -129,11 +129,13 @@ func NewJobClient(config XxlJobConf) XxlJobClient {
 		xxl.SetLogger(&logger{}),
 	)
 
-	return XxlJobClient{
+	client := XxlJobClient{
 		Enabled:  config.Enabled,
 		Executor: exec,
 		Conf:     config,
 	}
+	client.init()
+	return client
 }
 
 func readLogFile(filePath string, fromLineNo int) (string, error) {
@@ -166,33 +168,39 @@ func readLogFile(filePath string, fromLineNo int) (string, error) {
 }
 
 func startClearLogFile(config XxlJobConf) {
+	// 启动时清理一次, 然后每小时清理一次
+	clearLogFile(config)
 	tick := time.Tick(1 * time.Hour)
 	for {
 		select {
 		case <-tick:
-			logrus.Info("开始清理Xxl-Job日志")
-			logRetention := config.LogRetention
-			whiteListLogs := make([]string, 0)
-			for i := 0; i <= logRetention; i++ {
-				date := time.Now().Add(-time.Duration(i) * 24 * time.Hour).Format(time.DateOnly)
-				whiteListLogs = append(whiteListLogs, date)
-			}
-			err := filepath.Walk(config.LogDir, func(path string, info os.FileInfo, err error) error {
-				if path == config.LogDir || info == nil {
-					return nil
-				}
-				fullPath := strings.Replace(path, config.LogDir, config.LogDir, -1)
-				if info.IsDir() && !slices.Contains(whiteListLogs, info.Name()) {
-					if err := os.RemoveAll(fullPath); err != nil {
-						logrus.Error(err.Error())
-					}
-				}
-				return nil
-			})
-			if err != nil {
-				logrus.Error(err)
-			}
+			clearLogFile(config)
 			break
 		}
+	}
+}
+
+func clearLogFile(config XxlJobConf) {
+	logrus.Info("开始清理Xxl-Job日志")
+	logRetention := config.LogRetention
+	whiteListLogs := make([]string, 0)
+	for i := 0; i <= logRetention; i++ {
+		date := time.Now().Add(-time.Duration(i) * 24 * time.Hour).Format(time.DateOnly)
+		whiteListLogs = append(whiteListLogs, date)
+	}
+	err := filepath.Walk(config.LogDir, func(path string, info os.FileInfo, err error) error {
+		if path == config.LogDir || info == nil {
+			return nil
+		}
+		fullPath := strings.Replace(path, config.LogDir, config.LogDir, -1)
+		if info.IsDir() && !slices.Contains(whiteListLogs, info.Name()) {
+			if err := os.RemoveAll(fullPath); err != nil {
+				logrus.Error(err.Error())
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		logrus.Error(err)
 	}
 }

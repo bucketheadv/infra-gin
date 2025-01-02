@@ -1,4 +1,4 @@
-package components
+package xxljob
 
 import (
 	"bufio"
@@ -23,7 +23,7 @@ func (l *logger) Error(format string, a ...interface{}) {
 	logrus.Printf("XxlJob日志 - "+format, a...)
 }
 
-type XxlJobConf struct {
+type Conf struct {
 	Enabled      bool   `json:"enabled"`
 	ServerAddr   string `json:"serverAddr"`
 	AccessToken  string `json:"accessToken"`
@@ -33,13 +33,32 @@ type XxlJobConf struct {
 	LogRetention int    `json:"logRetention"`
 }
 
-type XxlJobClient struct {
+type Client struct {
 	Enabled  bool
 	Executor xxl.Executor
-	Conf     XxlJobConf
+	Conf     Conf
 }
 
-func (p *XxlJobClient) init() {
+func NewClient(config Conf) Client {
+	// 开始日志清理
+	exec := xxl.NewExecutor(
+		xxl.ServerAddr(config.ServerAddr),
+		xxl.AccessToken(config.AccessToken),
+		xxl.ExecutorPort(config.ExecutorPort),
+		xxl.RegistryKey(config.RegistryKey),
+		xxl.SetLogger(&logger{}),
+	)
+
+	client := Client{
+		Enabled:  config.Enabled,
+		Executor: exec,
+		Conf:     config,
+	}
+	client.init()
+	return client
+}
+
+func (p *Client) init() {
 	if !p.Enabled {
 		return
 	}
@@ -81,7 +100,7 @@ func (p *XxlJobClient) init() {
 	}()
 }
 
-func (p *XxlJobClient) LogJobInfo(param *xxl.RunReq, format string, a ...interface{}) {
+func (p *Client) LogJobInfo(param *xxl.RunReq, format string, a ...interface{}) {
 	dir := fmt.Sprintf("%s%c%s", p.Conf.LogDir, os.PathSeparator, time.Now().Format(time.DateOnly))
 	if _, err := os.Stat(dir); err != nil {
 		if err := os.MkdirAll(dir, os.ModePerm); err != nil {
@@ -112,30 +131,11 @@ func (p *XxlJobClient) LogJobInfo(param *xxl.RunReq, format string, a ...interfa
 	_, _ = f.WriteString(logData)
 }
 
-func (p *XxlJobClient) RegTask(pattern string, taskFunc xxl.TaskFunc) {
+func (p *Client) RegTask(pattern string, taskFunc xxl.TaskFunc) {
 	if !p.Enabled {
 		return
 	}
 	p.Executor.RegTask(pattern, taskFunc)
-}
-
-func NewJobClient(config XxlJobConf) XxlJobClient {
-	// 开始日志清理
-	exec := xxl.NewExecutor(
-		xxl.ServerAddr(config.ServerAddr),
-		xxl.AccessToken(config.AccessToken),
-		xxl.ExecutorPort(config.ExecutorPort),
-		xxl.RegistryKey(config.RegistryKey),
-		xxl.SetLogger(&logger{}),
-	)
-
-	client := XxlJobClient{
-		Enabled:  config.Enabled,
-		Executor: exec,
-		Conf:     config,
-	}
-	client.init()
-	return client
 }
 
 func readLogFile(filePath string, fromLineNo int) (string, error) {
@@ -167,7 +167,7 @@ func readLogFile(filePath string, fromLineNo int) (string, error) {
 	return strings.Join(lines, "\n"), nil
 }
 
-func startClearLogFile(config XxlJobConf) {
+func startClearLogFile(config Conf) {
 	// 启动时清理一次, 然后每小时清理一次
 	clearLogFile(config)
 	tick := time.Tick(1 * time.Hour)
@@ -180,7 +180,7 @@ func startClearLogFile(config XxlJobConf) {
 	}
 }
 
-func clearLogFile(config XxlJobConf) {
+func clearLogFile(config Conf) {
 	logrus.Info("开始清理Xxl-Job日志")
 	logRetention := config.LogRetention
 	whiteListLogs := make([]string, 0)

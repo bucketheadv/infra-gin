@@ -1,4 +1,4 @@
-package components
+package apollo
 
 import (
 	"cmp"
@@ -22,7 +22,7 @@ func (c *apolloChangeListener) OnNewestChange(event *storage.FullChangeEvent) {
 	logrus.Infof("Apollo config pull, namespace [%s] updated to latest version", event.Namespace)
 }
 
-type ApolloConf struct {
+type Conf struct {
 	Enabled        bool   `json:"enabled"`
 	AppID          string `json:"appId"`
 	Cluster        string `json:"cluster"`
@@ -33,7 +33,7 @@ type ApolloConf struct {
 
 var apolloClient agollo.Client
 
-func InitApolloClient(c ApolloConf, onSuccess func()) {
+func InitClient(c Conf, onSuccess func()) {
 	if !c.Enabled {
 		return
 	}
@@ -61,23 +61,23 @@ func InitApolloClient(c ApolloConf, onSuccess func()) {
 }
 
 func AssignConfigValueTo[T cmp.Ordered | bool](namespace, key string, value *T) {
-	var s = ApolloNamespace(namespace).GetValue(key)
+	var s = Namespace(namespace).GetValue(key)
 	if s == "" {
 		return
 	}
 	infracore.ConvertStringTo(s, value)
 }
 
-func ApolloApplicationConfig(key string) string {
+func ApplicationConfig(key string) string {
 	return apolloClient.GetValue(key)
 }
 
-func ApolloNamespace(namespace string) *storage.Config {
+func Namespace(namespace string) *storage.Config {
 	return apolloClient.GetConfig(namespace)
 }
 
-func ApolloNamespaceValue[T cmp.Ordered | bool](namespace, key string) T {
-	v := ApolloNamespace(namespace).GetValue(key)
+func NamespaceValue[T cmp.Ordered | bool](namespace, key string) T {
+	v := Namespace(namespace).GetValue(key)
 	var t T
 	infracore.ConvertStringTo(v, &t)
 	return t

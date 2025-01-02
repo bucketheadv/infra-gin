@@ -1,4 +1,4 @@
-package components
+package rocket
 
 import (
 	"context"
@@ -12,10 +12,7 @@ import (
 	"time"
 )
 
-var RocketMQProducer rocketmq.Producer
-var RocketMQConsumer rocketmq.PushConsumer
-
-type RocketMQConf struct {
+type Conf struct {
 	Enabled      bool                  `json:"enabled"`
 	NameServer   []string              `json:"nameServer"`
 	MessageModel consumer.MessageModel `json:"messageModel"`
@@ -32,14 +29,21 @@ func (p *InfraRocketMQProducer) SendSync(msg *primitive.Message) (*primitive.Sen
 	if !p.Enabled {
 		return nil, errors.New("RocketMQ not enabled")
 	}
-	return RocketMQProducer.SendSync(context.Background(), msg)
+	return p.Producer.SendSync(context.Background(), msg)
 }
 
 func (p *InfraRocketMQProducer) SendAsync(mq func(ctx context.Context, result *primitive.SendResult, err error), msg ...*primitive.Message) error {
 	if !p.Enabled {
 		return errors.New("RocketMQ not enabled")
 	}
-	return RocketMQProducer.SendAsync(context.Background(), mq, msg...)
+	return p.Producer.SendAsync(context.Background(), mq, msg...)
+}
+
+func (p *InfraRocketMQProducer) SendOneWay(mq ...*primitive.Message) error {
+	if !p.Enabled {
+		return errors.New("RocketMQ not enabled")
+	}
+	return p.Producer.SendOneWay(context.Background(), mq...)
 }
 
 type InfraRocketMQConsumer struct {
@@ -51,7 +55,7 @@ func (p *InfraRocketMQConsumer) RegConsumer(topic string, f func(context.Context
 	if !p.Enabled {
 		return
 	}
-	c := RocketMQConsumer
+	c := p.Consumer
 	err := c.Subscribe(topic, consumer.MessageSelector{}, f)
 	if err != nil {
 		logrus.Errorf("注册topic: %s 失败, 1分钟后将重试, 错误信息: %s", topic, err)
@@ -61,7 +65,7 @@ func (p *InfraRocketMQConsumer) RegConsumer(topic string, f func(context.Context
 	}
 }
 
-func InitProducer(config RocketMQConf) InfraRocketMQProducer {
+func InitProducer(config Conf) InfraRocketMQProducer {
 	prod, err := rocketmq.NewProducer(
 		producer.WithNameServer(config.NameServer),
 		producer.WithRetry(config.Retry),
@@ -76,14 +80,13 @@ func InitProducer(config RocketMQConf) InfraRocketMQProducer {
 			logrus.Fatal(err)
 		}
 	}
-	RocketMQProducer = prod
 	return InfraRocketMQProducer{
 		Enabled:  config.Enabled,
 		Producer: prod,
 	}
 }
 
-func InitConsumer(config RocketMQConf) InfraRocketMQConsumer {
+func InitConsumer(config Conf) InfraRocketMQConsumer {
 	c, err := rocketmq.NewPushConsumer(
 		consumer.WithNameServer(config.NameServer),
 		consumer.WithRetry(config.Retry),
@@ -99,14 +102,13 @@ func InitConsumer(config RocketMQConf) InfraRocketMQConsumer {
 			logrus.Fatal(err)
 		}
 	}
-	RocketMQConsumer = c
 	return InfraRocketMQConsumer{
 		Enabled:  config.Enabled,
 		Consumer: c,
 	}
 }
 
-func createTopic(config RocketMQConf, topic string) {
+func CreateTopic(config Conf, topic string) {
 	h, err := admin.NewAdmin(admin.WithResolver(primitive.NewPassthroughResolver(config.NameServer)))
 	if err != nil {
 		logrus.Fatal(err)

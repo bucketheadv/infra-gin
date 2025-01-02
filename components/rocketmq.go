@@ -9,6 +9,7 @@ import (
 	"github.com/apache/rocketmq-client-go/v2/primitive"
 	"github.com/apache/rocketmq-client-go/v2/producer"
 	"github.com/sirupsen/logrus"
+	"time"
 )
 
 var RocketMQProducer rocketmq.Producer
@@ -53,11 +54,10 @@ func (p *InfraRocketMQConsumer) RegConsumer(topic string, f func(context.Context
 	c := RocketMQConsumer
 	err := c.Subscribe(topic, consumer.MessageSelector{}, f)
 	if err != nil {
-		logrus.Error(err)
-	}
-	err = c.Start()
-	if err != nil {
-		logrus.Error(err)
+		logrus.Errorf("注册topic: %s 失败, 1分钟后将重试, 错误信息: %s", topic, err)
+		time.AfterFunc(1*time.Minute, func() {
+			p.RegConsumer(topic, f)
+		})
 	}
 }
 
@@ -84,7 +84,7 @@ func InitProducer(config RocketMQConf) InfraRocketMQProducer {
 }
 
 func InitConsumer(config RocketMQConf) InfraRocketMQConsumer {
-	consume, err := rocketmq.NewPushConsumer(
+	c, err := rocketmq.NewPushConsumer(
 		consumer.WithNameServer(config.NameServer),
 		consumer.WithRetry(config.Retry),
 		consumer.WithConsumerModel(config.MessageModel),
@@ -94,15 +94,15 @@ func InitConsumer(config RocketMQConf) InfraRocketMQConsumer {
 		logrus.Fatal(err)
 	}
 	if config.Enabled {
-		err = consume.Start()
+		err = c.Start()
 		if err != nil {
 			logrus.Fatal(err)
 		}
 	}
-	RocketMQConsumer = consume
+	RocketMQConsumer = c
 	return InfraRocketMQConsumer{
 		Enabled:  config.Enabled,
-		Consumer: consume,
+		Consumer: c,
 	}
 }
 

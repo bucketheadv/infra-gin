@@ -2,13 +2,11 @@ package middlewares
 
 import (
 	"github.com/bucketheadv/infragin"
-	"github.com/bucketheadv/infragin/components"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
-func init() {
-	e := components.Engine
+func RegHandlers(e *gin.Engine) {
 	e.Use(globalPanicHandler())
 	e.Use(globalErrorHandler())
 	e.NoRoute(func(c *gin.Context) {

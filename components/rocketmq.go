@@ -53,11 +53,11 @@ func (p *InfraRocketMQConsumer) RegConsumer(topic string, f func(context.Context
 	c := RocketMQConsumer
 	err := c.Subscribe(topic, consumer.MessageSelector{}, f)
 	if err != nil {
-		logrus.Fatal(err)
+		logrus.Error(err)
 	}
 	err = c.Start()
 	if err != nil {
-		logrus.Fatal(err)
+		logrus.Error(err)
 	}
 }
 

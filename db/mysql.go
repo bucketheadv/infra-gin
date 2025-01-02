@@ -2,12 +2,12 @@ package db
 
 import (
 	"database/sql"
-	"github.com/bucketheadv/infra-gin"
+	"github.com/bucketheadv/infragin"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
-func Page(db *gorm.DB, page infra.Page) *gorm.DB {
+func Page(db *gorm.DB, page infragin.Page) *gorm.DB {
 	return db.Offset(page.Offset()).Limit(page.Limit())
 }
 

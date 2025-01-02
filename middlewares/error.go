@@ -1,8 +1,8 @@
 package middlewares
 
 import (
-	"github.com/bucketheadv/infra-gin"
-	"github.com/bucketheadv/infra-gin/components"
+	"github.com/bucketheadv/infragin"
+	"github.com/bucketheadv/infragin/components"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -12,11 +12,11 @@ func init() {
 	e.Use(globalPanicHandler())
 	e.Use(globalErrorHandler())
 	e.NoRoute(func(c *gin.Context) {
-		var response = infra.Response[any]{
+		var response = infragin.Response[any]{
 			Code:    http.StatusNotFound,
 			Message: http.StatusText(http.StatusNotFound),
 		}
-		infra.ApiResponseError(c, response)
+		infragin.ApiResponseError(c, response)
 	})
 }
 
@@ -33,11 +33,11 @@ func globalPanicHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {
 			if r := recover(); r != nil {
-				var response = infra.Response[any]{
+				var response = infragin.Response[any]{
 					Code:    http.StatusInternalServerError,
 					Message: errorToString(r),
 				}
-				infra.ApiResponseError(c, response)
+				infragin.ApiResponseError(c, response)
 			}
 		}()
 		c.Next()
@@ -48,11 +48,11 @@ func globalErrorHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Next()
 		if len(c.Errors) > 0 {
-			var response = infra.Response[any]{
+			var response = infragin.Response[any]{
 				Code:    http.StatusInternalServerError,
 				Message: c.Errors.String(),
 			}
-			infra.ApiResponseError(c, response)
+			infragin.ApiResponseError(c, response)
 			c.Abort()
 			return
 		}

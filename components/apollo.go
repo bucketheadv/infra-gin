@@ -5,7 +5,7 @@ import (
 	"github.com/apolloconfig/agollo/v4"
 	"github.com/apolloconfig/agollo/v4/env/config"
 	"github.com/apolloconfig/agollo/v4/storage"
-	core "github.com/bucketheadv/infra-core"
+	"github.com/bucketheadv/infracore"
 	"github.com/sirupsen/logrus"
 )
 
@@ -71,6 +71,6 @@ func ApolloNamespace(namespace string) *storage.Config {
 func ApolloNamespaceValue[T cmp.Ordered | bool](namespace, key string) T {
 	v := ApolloNamespace(namespace).GetValue(key)
 	var t T
-	core.ConvertStringTo(v, &t)
+	infracore.ConvertStringTo(v, &t)
 	return t
 }

@@ -60,6 +60,14 @@ func InitApolloClient(c ApolloConf, onSuccess func()) {
 	}
 }
 
+func AssignConfigValueTo[T cmp.Ordered | bool](namespace, key string, value *T) {
+	var s = ApolloNamespace(namespace).GetValue(key)
+	if s == "" {
+		return
+	}
+	infracore.ConvertStringTo(s, value)
+}
+
 func ApolloApplicationConfig(key string) string {
 	return apolloClient.GetValue(key)
 }

@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func RegHandlers(e *gin.Engine) {
+func RegErrorHandler(e *gin.Engine) {
 	e.Use(globalPanicHandler())
 	e.Use(globalErrorHandler())
 	e.NoRoute(func(c *gin.Context) {

@@ -22,31 +22,31 @@ type RocketMQConf struct {
 	Retry        int                   `json:"retry"`
 }
 
-type RocketMQProducerInfra struct {
+type InfraRocketMQProducer struct {
 	Enabled  bool
 	Producer rocketmq.Producer
 }
 
-func (p *RocketMQProducerInfra) SendSync(msg *primitive.Message) (*primitive.SendResult, error) {
+func (p *InfraRocketMQProducer) SendSync(msg *primitive.Message) (*primitive.SendResult, error) {
 	if !p.Enabled {
 		return nil, errors.New("RocketMQ not enabled")
 	}
 	return RocketMQProducer.SendSync(context.Background(), msg)
 }
 
-func (p *RocketMQProducerInfra) SendAsync(mq func(ctx context.Context, result *primitive.SendResult, err error), msg ...*primitive.Message) error {
+func (p *InfraRocketMQProducer) SendAsync(mq func(ctx context.Context, result *primitive.SendResult, err error), msg ...*primitive.Message) error {
 	if !p.Enabled {
 		return errors.New("RocketMQ not enabled")
 	}
 	return RocketMQProducer.SendAsync(context.Background(), mq, msg...)
 }
 
-type RocketMQConsumerInfra struct {
+type InfraRocketMQConsumer struct {
 	Enabled  bool
 	Consumer rocketmq.PushConsumer
 }
 
-func (p *RocketMQConsumerInfra) RegConsumer(topic string, f func(context.Context, ...*primitive.MessageExt) (consumer.ConsumeResult, error)) {
+func (p *InfraRocketMQConsumer) RegConsumer(topic string, f func(context.Context, ...*primitive.MessageExt) (consumer.ConsumeResult, error)) {
 	if !p.Enabled {
 		return
 	}
@@ -61,7 +61,7 @@ func (p *RocketMQConsumerInfra) RegConsumer(topic string, f func(context.Context
 	}
 }
 
-func InitProducer(config RocketMQConf) RocketMQProducerInfra {
+func InitProducer(config RocketMQConf) InfraRocketMQProducer {
 	prod, err := rocketmq.NewProducer(
 		producer.WithNameServer(config.NameServer),
 		producer.WithRetry(config.Retry),
@@ -77,13 +77,13 @@ func InitProducer(config RocketMQConf) RocketMQProducerInfra {
 		}
 	}
 	RocketMQProducer = prod
-	return RocketMQProducerInfra{
+	return InfraRocketMQProducer{
 		Enabled:  config.Enabled,
 		Producer: prod,
 	}
 }
 
-func InitConsumer(config RocketMQConf) RocketMQConsumerInfra {
+func InitConsumer(config RocketMQConf) InfraRocketMQConsumer {
 	consume, err := rocketmq.NewPushConsumer(
 		consumer.WithNameServer(config.NameServer),
 		consumer.WithRetry(config.Retry),
@@ -100,7 +100,7 @@ func InitConsumer(config RocketMQConf) RocketMQConsumerInfra {
 		}
 	}
 	RocketMQConsumer = consume
-	return RocketMQConsumerInfra{
+	return InfraRocketMQConsumer{
 		Enabled:  config.Enabled,
 		Consumer: consume,
 	}

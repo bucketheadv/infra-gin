@@ -70,9 +70,11 @@ func InitProducer(config RocketMQConf) RocketMQProducerInfra {
 	if err != nil {
 		logrus.Fatal(err)
 	}
-	err = prod.Start()
-	if err != nil {
-		logrus.Fatal(err)
+	if config.Enabled {
+		err = prod.Start()
+		if err != nil {
+			logrus.Fatal(err)
+		}
 	}
 	RocketMQProducer = prod
 	return RocketMQProducerInfra{
@@ -91,9 +93,11 @@ func InitConsumer(config RocketMQConf) RocketMQConsumerInfra {
 	if err != nil {
 		logrus.Fatal(err)
 	}
-	err = consume.Start()
-	if err != nil {
-		logrus.Fatal(err)
+	if config.Enabled {
+		err = consume.Start()
+		if err != nil {
+			logrus.Fatal(err)
+		}
 	}
 	RocketMQConsumer = consume
 	return RocketMQConsumerInfra{

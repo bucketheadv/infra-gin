@@ -5,6 +5,7 @@ go 1.23.4
 require (
 	github.com/apache/rocketmq-client-go/v2 v2.1.2
 	github.com/apolloconfig/agollo/v4 v4.4.0
+	github.com/bucketheadv/infra-core v0.0.2
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/sirupsen/logrus v1.4.0
@@ -13,7 +14,6 @@ require (
 )
 
 require (
-	github.com/bucketheadv/infra-core v0.0.1 // indirect
 	github.com/bytedance/sonic v1.11.6 // indirect
 	github.com/bytedance/sonic/loader v0.1.1 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect

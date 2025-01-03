@@ -5,13 +5,13 @@ go 1.23.4
 require (
 	github.com/apache/rocketmq-client-go/v2 v2.1.2
 	github.com/apolloconfig/agollo/v4 v4.4.0
-	github.com/bucketheadv/infracore v0.0.2
+	github.com/bucketheadv/infracore v0.0.3
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-redis/redis/v8 v8.11.5
-	github.com/sirupsen/logrus v1.4.0
+	github.com/sirupsen/logrus v1.9.3
 	github.com/xxl-job/xxl-job-executor-go v1.2.0
-	gorm.io/gorm v1.25.12
 	gorm.io/driver/mysql v1.5.7
+	gorm.io/gorm v1.25.12
 )
 
 require (
@@ -29,6 +29,7 @@ require (
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.20.0 // indirect
+	github.com/go-sql-driver/mysql v1.7.0 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/golang/mock v1.5.0 // indirect
 	github.com/google/uuid v1.3.0 // indirect
@@ -37,7 +38,6 @@ require (
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.7 // indirect
-	github.com/konsorten/go-windows-terminal-sequences v1.0.1 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/magiconair/properties v1.8.5 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
@@ -64,7 +64,6 @@ require (
 	golang.org/x/crypto v0.23.0 // indirect
 	golang.org/x/net v0.25.0 // indirect
 	golang.org/x/sys v0.20.0 // indirect
-	golang.org/x/term v0.20.0 // indirect
 	golang.org/x/text v0.15.0 // indirect
 	google.golang.org/protobuf v1.34.1 // indirect
 	gopkg.in/ini.v1 v1.62.0 // indirect

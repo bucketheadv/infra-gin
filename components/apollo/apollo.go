@@ -68,7 +68,7 @@ func AssignConfigValueTo[T cmp.Ordered | bool](namespace, key string, value *T) 
 	infracore.ConvertStringTo(s, value)
 }
 
-func ApplicationConfig(key string) string {
+func ApplicationValue(key string) string {
 	return apolloClient.GetValue(key)
 }
 

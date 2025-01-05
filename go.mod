@@ -3,6 +3,7 @@ module github.com/bucketheadv/infragin
 go 1.23.4
 
 require (
+	github.com/BurntSushi/toml v1.1.0
 	github.com/apache/rocketmq-client-go/v2 v2.1.2
 	github.com/apolloconfig/agollo/v4 v4.4.0
 	github.com/bucketheadv/infracore v0.0.3

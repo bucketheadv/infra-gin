@@ -24,13 +24,13 @@ func (l *logger) Error(format string, a ...interface{}) {
 }
 
 type Conf struct {
-	Enabled      bool   `json:"enabled"`
-	ServerAddr   string `json:"serverAddr"`
-	AccessToken  string `json:"accessToken"`
-	ExecutorPort string `json:"executorPort"`
-	RegistryKey  string `json:"registryKey"`
-	LogDir       string `json:"logDir"`
-	LogRetention int    `json:"logRetention"`
+	Enabled      bool
+	ServerAddr   string
+	AccessToken  string
+	ExecutorPort string
+	RegistryKey  string
+	LogDir       string
+	LogRetention int
 }
 
 type Client struct {

@@ -11,12 +11,12 @@ import (
 )
 
 type Conf struct {
-	Server   infragin.ServerConf      `json:"Server"`
-	Apollo   apollo.Conf              `json:"Apollo"`
-	XxlJob   xxljob.Conf              `json:"XxlJob"`
-	MySql    map[string]db.MySqlConf  `json:"MySQL"`
-	Redis    map[string]redis.Options `json:"Redis"`
-	RocketMQ map[string]rocket.Conf   `json:"RocketMQ"`
+	Server   infragin.ServerConf
+	Apollo   apollo.Conf
+	XxlJob   xxljob.Conf
+	MySql    map[string]db.MySqlConf
+	Redis    map[string]redis.Options
+	RocketMQ map[string]rocket.Conf
 }
 
 func Parse(configFile string, config *Conf) error {

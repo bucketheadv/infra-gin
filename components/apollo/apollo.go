@@ -23,12 +23,12 @@ func (c *apolloChangeListener) OnNewestChange(event *storage.FullChangeEvent) {
 }
 
 type Conf struct {
-	Enabled        bool   `json:"enabled"`
-	AppID          string `json:"appId"`
-	Cluster        string `json:"cluster"`
-	NamespaceName  string `json:"namespaceName"`
-	IP             string `json:"ip"`
-	IsBackupConfig bool   `default:"true" json:"isBackupConfig"`
+	Enabled        bool
+	AppID          string
+	Cluster        string
+	NamespaceName  string
+	IP             string
+	IsBackupConfig bool
 }
 
 var apolloClient agollo.Client

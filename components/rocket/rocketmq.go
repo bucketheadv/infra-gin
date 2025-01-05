@@ -13,11 +13,11 @@ import (
 )
 
 type Conf struct {
-	Enabled      bool                  `json:"enabled"`
-	NameServer   []string              `json:"nameServer"`
-	MessageModel consumer.MessageModel `json:"messageModel"`
-	GroupName    string                `json:"groupName"`
-	Retry        int                   `json:"retry"`
+	Enabled      bool
+	NameServer   []string
+	MessageModel consumer.MessageModel
+	GroupName    string
+	Retry        int
 }
 
 type InfraRocketMQProducer struct {

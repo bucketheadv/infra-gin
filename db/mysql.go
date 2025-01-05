@@ -9,7 +9,7 @@ import (
 )
 
 type MySqlConf struct {
-	Url string `json:"url"`
+	Url string
 }
 
 func NewMySQL(config MySqlConf, gormConfig *gorm.Config) *gorm.DB {

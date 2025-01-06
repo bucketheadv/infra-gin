@@ -8,11 +8,11 @@ import (
 	"gorm.io/gorm"
 )
 
-type MySqlConf struct {
+type MySQLConf struct {
 	Url string
 }
 
-func NewMySQL(config MySqlConf, gormConfig *gorm.Config) *gorm.DB {
+func NewMySQL(config MySQLConf, gormConfig *gorm.Config) *gorm.DB {
 	var err error
 	DB, err := gorm.Open(mysql.Open(config.Url), gormConfig)
 	if err != nil {

@@ -14,7 +14,7 @@ type Conf struct {
 	Server   infragin.ServerConf
 	Apollo   apollo.Conf
 	XxlJob   xxljob.Conf
-	MySql    map[string]*db.MySqlConf
+	MySQL    map[string]*db.MySQLConf
 	Redis    map[string]*redis.Options
 	RocketMQ map[string]*rocket.Conf
 }

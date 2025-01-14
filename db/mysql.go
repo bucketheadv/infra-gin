@@ -2,7 +2,7 @@ package db
 
 import (
 	"database/sql"
-	"github.com/bucketheadv/infragin"
+	"github.com/bucketheadv/infra-gin"
 	"github.com/sirupsen/logrus"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -21,7 +21,7 @@ func NewMySQL(config MySQLConf, gormConfig *gorm.Config) *gorm.DB {
 	return DB
 }
 
-func Page(db *gorm.DB, page infragin.Page) *gorm.DB {
+func Page(db *gorm.DB, page infra_gin.Page) *gorm.DB {
 	return db.Offset(page.Offset()).Limit(page.Limit())
 }
 

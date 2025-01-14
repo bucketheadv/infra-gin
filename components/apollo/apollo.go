@@ -5,7 +5,7 @@ import (
 	"github.com/apolloconfig/agollo/v4"
 	"github.com/apolloconfig/agollo/v4/env/config"
 	"github.com/apolloconfig/agollo/v4/storage"
-	"github.com/bucketheadv/infracore"
+	"github.com/bucketheadv/infra-core/basic"
 	"github.com/sirupsen/logrus"
 )
 
@@ -65,7 +65,7 @@ func AssignConfigValueTo[T cmp.Ordered | bool](namespace, key string, value *T) 
 	if s == "" {
 		return
 	}
-	infracore.ConvertStringTo(s, value)
+	basic.ConvertStringTo(s, value)
 }
 
 func ApplicationValue(key string) string {
@@ -79,6 +79,6 @@ func Namespace(namespace string) *storage.Config {
 func NamespaceValue[T cmp.Ordered | bool](namespace, key string) T {
 	v := Namespace(namespace).GetValue(key)
 	var t T
-	infracore.ConvertStringTo(v, &t)
+	basic.ConvertStringTo(v, &t)
 	return t
 }

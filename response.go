@@ -1,4 +1,4 @@
-package infragin
+package infra_gin
 
 import (
 	"github.com/gin-gonic/gin"

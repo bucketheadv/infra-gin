@@ -2,16 +2,16 @@ package conf
 
 import (
 	"github.com/BurntSushi/toml"
-	"github.com/bucketheadv/infragin"
-	"github.com/bucketheadv/infragin/components/apollo"
-	"github.com/bucketheadv/infragin/components/rocket"
-	"github.com/bucketheadv/infragin/components/xxljob"
-	"github.com/bucketheadv/infragin/db"
+	"github.com/bucketheadv/infra-gin"
+	"github.com/bucketheadv/infra-gin/components/apollo"
+	"github.com/bucketheadv/infra-gin/components/rocket"
+	"github.com/bucketheadv/infra-gin/components/xxljob"
+	"github.com/bucketheadv/infra-gin/db"
 	"github.com/go-redis/redis/v8"
 )
 
 type Conf struct {
-	Server   infragin.ServerConf
+	Server   infra_gin.ServerConf
 	Apollo   apollo.Conf
 	XxlJob   xxljob.Conf
 	MySQL    map[string]*db.MySQLConf

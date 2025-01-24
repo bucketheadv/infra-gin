@@ -13,7 +13,7 @@ type apolloChangeListener struct{}
 
 func (c *apolloChangeListener) OnChange(event *storage.ChangeEvent) {
 	for k, v := range event.Changes {
-		logrus.Infof("apollo %v config changed, key: %v, old value: %v, new value: %v",
+		logrus.Infof("Apollo %v config changed, key: %v, old value: %v, new value: %v",
 			event.Namespace, k, v.OldValue, v.NewValue)
 	}
 }
@@ -33,7 +33,7 @@ type Conf struct {
 
 var apolloClient agollo.Client
 
-func InitClient(c Conf, onSuccess func()) {
+func Init(c Conf, onSuccess func()) {
 	if !c.Enabled {
 		return
 	}
@@ -49,7 +49,7 @@ func InitClient(c Conf, onSuccess func()) {
 	})
 
 	if err != nil {
-		logrus.Infof("初始化Apollo失败, %s", err.Error())
+		logrus.Warnf("初始化Apollo失败, %s\n", err.Error())
 		return
 	}
 
@@ -60,12 +60,16 @@ func InitClient(c Conf, onSuccess func()) {
 	}
 }
 
-func AssignConfigValueTo[T cmp.Ordered | bool](namespace, key string, value *T) {
+func AssignNamespaceValue[T cmp.Ordered | bool](namespace, key string, value *T) {
 	var s = Namespace(namespace).GetValue(key)
 	if s == "" {
 		return
 	}
 	basic.ConvertStringTo(s, value)
+}
+
+func AssignApplicationValue[T cmp.Ordered | bool](key string, value *T) {
+	AssignNamespaceValue(storage.GetDefaultNamespace(), key, value)
 }
 
 func ApplicationValue(key string) string {

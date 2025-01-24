@@ -14,9 +14,9 @@ type Conf struct {
 	Server   infra_gin.ServerConf
 	Apollo   apollo.Conf
 	XxlJob   xxljob.Conf
-	MySQL    map[string]*db.MySQLConf
-	Redis    map[string]*redis.Options
-	RocketMQ map[string]*rocket.Conf
+	MySQL    map[string]db.MySQLConf
+	Redis    map[string]redis.Options
+	RocketMQ map[string]rocket.Conf
 }
 
 func Parse(configFile string, config *Conf) error {

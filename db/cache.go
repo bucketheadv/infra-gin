@@ -4,32 +4,31 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/go-redis/redis/v8"
-	"github.com/sirupsen/logrus"
 	"reflect"
 	"time"
 )
 
-func FetchCache[T any](redisClient *redis.Client, key string, ttl time.Duration, function func() T) T {
+func FetchCache[T any](redisClient *redis.Client, key string, ttl time.Duration, function func() T) (T, error) {
 	var ctx = context.Background()
 	value := redisClient.Get(ctx, key)
+	var result T
 	if value.Err() == nil {
-		var ret T
-		err := json.Unmarshal([]byte(value.Val()), &ret)
+		err := json.Unmarshal([]byte(value.Val()), &result)
 		if err != nil {
-			panic(err)
+			return result, err
 		}
-		return ret
+		return result, nil
 	}
-	result := function()
+	result = function()
 	bytes, err := json.Marshal(result)
 	if err != nil {
-		panic(err)
+		return result, err
 	}
 	redisClient.Set(ctx, key, bytes, ttl)
-	return result
+	return result, nil
 }
 
-func GetCaches[T any](redisClient *redis.Client, keys []string) []T {
+func GetCaches[T any](redisClient *redis.Client, keys []string) ([]T, error) {
 	var ctx = context.Background()
 	value := redisClient.MGet(ctx, keys...)
 	var result = make([]T, 0)
@@ -40,14 +39,14 @@ func GetCaches[T any](redisClient *redis.Client, keys []string) []T {
 		var ret T
 		err := json.Unmarshal(([]byte)(v.(string)), &ret)
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 		result = append(result, ret)
 	}
-	return result
+	return result, nil
 }
 
-func SetCache(redisClient *redis.Client, key string, value any, ttl time.Duration) {
+func SetCache(redisClient *redis.Client, key string, value any, ttl time.Duration) error {
 	var ctx = context.Background()
 	var s string
 	if reflect.TypeOf(value).Kind() == reflect.String {
@@ -55,12 +54,13 @@ func SetCache(redisClient *redis.Client, key string, value any, ttl time.Duratio
 	} else {
 		data, err := json.Marshal(value)
 		if err != nil {
-			logrus.Error(err)
+			return err
 		}
 		s = string(data)
 	}
 	result := redisClient.Set(ctx, key, s, ttl)
 	if result.Err() != nil {
-		logrus.Error(result.Err())
+		return result.Err()
 	}
+	return nil
 }

@@ -8,20 +8,19 @@ import (
 )
 
 var (
-	ParamError        = errors.New("参数错误")
-	ParamConvertError = errors.New("参数转换错误")
-	ParamBlankError   = errors.New("参数为空")
+	ErrParamInvalid = errors.New("参数错误")
+	ErrParamBlank   = errors.New("参数为空")
 )
 
 func GetQuery[T cmp.Ordered](c *gin.Context, key string) (T, error) {
 	var v T
 	q, success := c.GetQuery(key)
 	if !success {
-		return v, ParamError
+		return v, ErrParamInvalid
 	}
 
 	if q == "" {
-		return v, ParamBlankError
+		return v, ErrParamBlank
 	}
 
 	err := basic.ConvertStringTo(q, &v)

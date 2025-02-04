@@ -55,8 +55,8 @@ github.com/armon/go-metrics v0.0.0-20180917152333-f0300d1749da/go.mod h1:Q73ZrmV
 github.com/armon/go-radix v0.0.0-20180808171621-7fddfc383310/go.mod h1:ufUuZ+zHj4x4TnLV4JWEpy2hxWSpsRywHrMgIH9cCH8=
 github.com/bgentry/speakeasy v0.1.0/go.mod h1:+zsyZBPWlz7T6j88CTgSN5bM796AkVf0kBD4zp0CCIs=
 github.com/bketelsen/crypt v0.0.4/go.mod h1:aI6NrJ0pMGgvZKL1iVgXLnfIFJtfV+bKCoqOes/6LfM=
-github.com/bucketheadv/infra-core v0.0.5 h1:JVMgEHn+8IgReoJ+4b6LPLcx/HpYrBKNjbG7NkWYZM4=
-github.com/bucketheadv/infra-core v0.0.5/go.mod h1:3ui40clLukpm54ZYgSmkl+bytIKWoyEu9Miis2TjGj0=
+github.com/bucketheadv/infra-core v0.0.6 h1:DY6UgkyGYJV/FMO1n3/6MkoPzVD5xgzjJld3CNHY46w=
+github.com/bucketheadv/infra-core v0.0.6/go.mod h1:3ui40clLukpm54ZYgSmkl+bytIKWoyEu9Miis2TjGj0=
 github.com/bytedance/sonic v1.11.6 h1:oUp34TzMlL+OY1OUWxHqsdkgC/Zfc85zGqw9siXjrc0=
 github.com/bytedance/sonic v1.11.6/go.mod h1:LysEHSvpvDySVdC2f87zGWf6CIKJcAvqab1ZaiQtds4=
 github.com/bytedance/sonic/loader v0.1.1 h1:c+e5Pt1k/cy5wMveRDyk2X4B9hF4g7an8N3zCYjJFNM=

@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func FetchCache[T any](redisClient *redis.Client, key string, ttl time.Duration, function func() T) (T, error) {
+func FetchCache[T any](redisClient *redis.Client, key string, ttl time.Duration, function func() (T, error)) (T, error) {
 	var ctx = context.Background()
 	value := redisClient.Get(ctx, key)
 	var result T
@@ -19,7 +19,10 @@ func FetchCache[T any](redisClient *redis.Client, key string, ttl time.Duration,
 		}
 		return result, nil
 	}
-	result = function()
+	result, err := function()
+	if err != nil {
+		return result, err
+	}
 	bytes, err := json.Marshal(result)
 	if err != nil {
 		return result, err

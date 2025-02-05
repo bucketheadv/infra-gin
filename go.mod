@@ -6,7 +6,7 @@ require (
 	github.com/BurntSushi/toml v1.1.0
 	github.com/apache/rocketmq-client-go/v2 v2.1.2
 	github.com/apolloconfig/agollo/v4 v4.4.0
-	github.com/bucketheadv/infra-core v0.0.7
+	github.com/bucketheadv/infra-core v0.0.9-0.20250205122159-3c4ace9441d9
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/xxl-job/xxl-job-executor-go v1.2.0

@@ -23,6 +23,6 @@ func GetQuery[T cmp.Ordered](c *gin.Context, key string) (T, error) {
 		return v, ErrParamBlank
 	}
 
-	err := basic.ConvertStringTo(q, &v)
+	v, err := basic.StringTo[T](q)
 	return v, err
 }

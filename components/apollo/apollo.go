@@ -65,7 +65,11 @@ func AssignNamespaceValue[T cmp.Ordered | bool](namespace, key string, value *T)
 	if s == "" {
 		return
 	}
-	basic.ConvertStringTo(s, value)
+	data, err := basic.StringTo[T](s)
+	if err != nil {
+		logger.Errorf("apollo配置转换失败, %s\n", err.Error())
+	}
+	*value = data
 }
 
 func AssignApplicationValue[T cmp.Ordered | bool](key string, value *T) {
@@ -82,7 +86,9 @@ func Namespace(namespace string) *storage.Config {
 
 func NamespaceValue[T cmp.Ordered | bool](namespace, key string) T {
 	v := Namespace(namespace).GetValue(key)
-	var t T
-	basic.ConvertStringTo(v, &t)
+	t, err := basic.StringTo[T](v)
+	if err != nil {
+		logger.Errorf("apollo配置转换失败, %s\n", err.Error())
+	}
 	return t
 }

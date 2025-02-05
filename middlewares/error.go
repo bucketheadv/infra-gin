@@ -1,9 +1,9 @@
 package middlewares
 
 import (
+	"github.com/bucketheadv/infra-core/modules/logger"
 	"github.com/bucketheadv/infra-gin"
 	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
 	"net/http"
 )
 
@@ -36,7 +36,7 @@ func globalPanicHandler() gin.HandlerFunc {
 					Code:    http.StatusInternalServerError,
 					Message: errorToString(r),
 				}
-				logrus.Errorf("http global panic msg: %s\n", errorToString(r))
+				logger.Errorf("http global panic msg: %s\n", errorToString(r))
 				infra_gin.ApiResponseError(c, response)
 			}
 		}()
@@ -52,7 +52,7 @@ func globalErrorHandler() gin.HandlerFunc {
 				Code:    http.StatusInternalServerError,
 				Message: c.Errors.String(),
 			}
-			logrus.Errorf("http global error msg: %s\n", errorToString(c.Errors.String()))
+			logger.Errorf("http global error msg: %s\n", errorToString(c.Errors.String()))
 			infra_gin.ApiResponseError(c, response)
 			c.Abort()
 			return

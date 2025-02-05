@@ -8,7 +8,7 @@ import (
 	"github.com/apache/rocketmq-client-go/v2/consumer"
 	"github.com/apache/rocketmq-client-go/v2/primitive"
 	"github.com/apache/rocketmq-client-go/v2/producer"
-	"github.com/sirupsen/logrus"
+	"github.com/bucketheadv/infra-core/modules/logger"
 	"time"
 )
 
@@ -58,7 +58,7 @@ func (p *InfraRocketMQConsumer) RegConsumer(topic string, f func(context.Context
 	c := p.Consumer
 	err := c.Subscribe(topic, consumer.MessageSelector{}, f)
 	if err != nil {
-		logrus.Errorf("注册topic: %s 失败, 1分钟后将重试, 错误信息: %s", topic, err)
+		logger.Errorf("注册topic: %s 失败, 1分钟后将重试, 错误信息: %s", topic, err)
 		time.AfterFunc(1*time.Minute, func() {
 			p.RegConsumer(topic, f)
 		})
@@ -72,12 +72,12 @@ func InitProducer(config Conf) InfraRocketMQProducer {
 		producer.WithGroupName(config.GroupName),
 	)
 	if err != nil {
-		logrus.Fatal(err)
+		logger.Fatal(err)
 	}
 	if config.Enabled {
 		err = prod.Start()
 		if err != nil {
-			logrus.Fatal(err)
+			logger.Fatal(err)
 		}
 	}
 	return InfraRocketMQProducer{
@@ -94,12 +94,12 @@ func InitConsumer(config Conf) InfraRocketMQConsumer {
 		consumer.WithGroupName(config.GroupName),
 	)
 	if err != nil {
-		logrus.Fatal(err)
+		logger.Fatal(err)
 	}
 	if config.Enabled {
 		err = c.Start()
 		if err != nil {
-			logrus.Fatal(err)
+			logger.Fatal(err)
 		}
 	}
 	return InfraRocketMQConsumer{
@@ -111,10 +111,10 @@ func InitConsumer(config Conf) InfraRocketMQConsumer {
 func CreateTopic(config Conf, topic string) {
 	h, err := admin.NewAdmin(admin.WithResolver(primitive.NewPassthroughResolver(config.NameServer)))
 	if err != nil {
-		logrus.Fatal(err)
+		logger.Fatal(err)
 	}
 	err = h.CreateTopic(context.Background(), admin.WithTopicCreate(topic))
 	if err != nil {
-		logrus.Println(err)
+		logger.Error(err)
 	}
 }

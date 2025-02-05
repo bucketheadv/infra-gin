@@ -2,8 +2,8 @@ package db
 
 import (
 	"database/sql"
+	"github.com/bucketheadv/infra-core/modules/logger"
 	"github.com/bucketheadv/infra-gin"
-	"github.com/sirupsen/logrus"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -16,7 +16,7 @@ func NewMySQL(config MySQLConf, gormConfig *gorm.Config) *gorm.DB {
 	var err error
 	DB, err := gorm.Open(mysql.Open(config.Url), gormConfig)
 	if err != nil {
-		logrus.Fatalln(err)
+		logger.Fatal(err)
 	}
 	return DB
 }
@@ -28,6 +28,6 @@ func Page(db *gorm.DB, page infra_gin.Page) *gorm.DB {
 func CloseRows(rows *sql.Rows) {
 	err := rows.Close()
 	if err != nil {
-		logrus.Error(err)
+		logger.Error(err)
 	}
 }

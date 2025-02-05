@@ -6,20 +6,20 @@ import (
 	"github.com/apolloconfig/agollo/v4/env/config"
 	"github.com/apolloconfig/agollo/v4/storage"
 	"github.com/bucketheadv/infra-core/basic"
-	"github.com/sirupsen/logrus"
+	"github.com/bucketheadv/infra-core/modules/logger"
 )
 
 type apolloChangeListener struct{}
 
 func (c *apolloChangeListener) OnChange(event *storage.ChangeEvent) {
 	for k, v := range event.Changes {
-		logrus.Infof("Apollo %v config changed, key: %v, old value: %v, new value: %v",
+		logger.Infof("Apollo %v config changed, key: %v, old value: %v, new value: %v",
 			event.Namespace, k, v.OldValue, v.NewValue)
 	}
 }
 
 func (c *apolloChangeListener) OnNewestChange(event *storage.FullChangeEvent) {
-	logrus.Infof("Apollo config pull, namespace [%s] updated to latest version", event.Namespace)
+	logger.Infof("Apollo config pull, namespace [%s] updated to latest version", event.Namespace)
 }
 
 type Conf struct {
@@ -49,7 +49,7 @@ func Init(c Conf, onSuccess func()) {
 	})
 
 	if err != nil {
-		logrus.Warnf("初始化Apollo失败, %s\n", err.Error())
+		logger.Warnf("初始化Apollo失败, %s\n", err.Error())
 		return
 	}
 

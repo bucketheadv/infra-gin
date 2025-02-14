@@ -2,7 +2,6 @@ package conf
 
 import (
 	"github.com/BurntSushi/toml"
-	"github.com/bucketheadv/infra-gin"
 	"github.com/bucketheadv/infra-gin/components/apollo"
 	"github.com/bucketheadv/infra-gin/components/rocket"
 	"github.com/bucketheadv/infra-gin/components/xxljob"
@@ -10,8 +9,12 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
+type ServerConf struct {
+	Port int
+}
+
 type Conf struct {
-	Server   infra_gin.ServerConf
+	Server   ServerConf
 	Apollo   apollo.Conf
 	XxlJob   xxljob.Conf
 	MySQL    map[string]db.MySQLConf

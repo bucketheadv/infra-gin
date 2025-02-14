@@ -39,11 +39,12 @@ func Init(c Conf, onSuccess func()) {
 	}
 	client, err := agollo.StartWithConfig(func() (*config.AppConfig, error) {
 		var appConfig = &config.AppConfig{
-			AppID:          c.AppID,
-			Cluster:        c.Cluster,
-			NamespaceName:  c.NamespaceName,
-			IP:             c.IP,
-			IsBackupConfig: c.IsBackupConfig,
+			AppID:             c.AppID,
+			Cluster:           c.Cluster,
+			NamespaceName:     c.NamespaceName,
+			IP:                c.IP,
+			IsBackupConfig:    c.IsBackupConfig,
+			SyncServerTimeout: 30, // 30秒超时
 		}
 		return appConfig, nil
 	})

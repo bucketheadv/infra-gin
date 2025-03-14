@@ -6,6 +6,7 @@ import (
 	"github.com/bucketheadv/infra-gin"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/schema"
 )
 
 type MySQLConf struct {
@@ -21,8 +22,33 @@ func NewMySQL(config MySQLConf, gormConfig *gorm.Config) *gorm.DB {
 	return DB
 }
 
-func Page(db *gorm.DB, page infra_gin.Page) *gorm.DB {
-	return db.Offset(page.Offset()).Limit(page.Limit())
+func Page[T schema.Tabler](db *gorm.DB, page infra_gin.Page) (infra_gin.PageResult[T], error) {
+	var tx = db.Offset(page.Offset()).Limit(page.Limit())
+	var data []T
+	rows, err := tx.Find(&data).Rows()
+	if err != nil {
+		return infra_gin.PageResult[T]{}, err
+	}
+
+	defer func(rows *sql.Rows) {
+		_ = rows.Close()
+	}(rows)
+
+	var total int64
+	tx.Count(&total)
+	var totalInt = (int)(total)
+	var pages = 0
+	if totalInt%page.PageSize == 0 {
+		pages = totalInt / page.PageSize
+	} else {
+		pages = totalInt/page.PageSize + 1
+	}
+	return infra_gin.PageResult[T]{
+		Page:    page,
+		Pages:   pages,
+		Total:   total,
+		Records: data,
+	}, nil
 }
 
 func CloseRows(rows *sql.Rows) {

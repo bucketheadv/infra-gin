@@ -25,12 +25,7 @@ func NewMySQL(config MySQLConf, gormConfig *gorm.Config) *gorm.DB {
 func Page[T schema.Tabler](db *gorm.DB, page infra_gin.Page) (infra_gin.PageResult[T], error) {
 	var tx = db.Offset(page.Offset()).Limit(page.Limit())
 	var data []T
-	rows, err := tx.Find(&data).Rows()
-	if err != nil {
-		return infra_gin.PageResult[T]{}, err
-	}
-
-	defer CloseRows(rows)
+	tx.Find(&data)
 
 	var total int64
 	tx.Count(&total)

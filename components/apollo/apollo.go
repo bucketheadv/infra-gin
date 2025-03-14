@@ -13,13 +13,13 @@ type apolloChangeListener struct{}
 
 func (c *apolloChangeListener) OnChange(event *storage.ChangeEvent) {
 	for k, v := range event.Changes {
-		logger.Infof("Apollo %v config changed, key: %v, old value: %v, new value: %v",
+		logger.Infof("Apollo %v 配置变更, key: %v, 旧值: %v, 新值: %v",
 			event.Namespace, k, v.OldValue, v.NewValue)
 	}
 }
 
 func (c *apolloChangeListener) OnNewestChange(event *storage.FullChangeEvent) {
-	logger.Infof("Apollo config pull, namespace [%s] updated to latest version", event.Namespace)
+	logger.Infof("Apollo拉取, 命名空间 [%s] 已更新到最新版本", event.Namespace)
 }
 
 type Conf struct {

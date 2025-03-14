@@ -39,7 +39,7 @@ func globalPanicHandler() gin.HandlerFunc {
 				Code:    http.StatusInternalServerError,
 				Message: errorToString(r),
 			}
-			logger.Errorf("http global panic msg: %s\n", errorToString(r))
+			logger.Errorf("中间件全局Panic捕获: %s\n", errorToString(r))
 			infra_gin.ApiResponseError(c, response)
 		}()
 		c.Next()
@@ -57,7 +57,7 @@ func globalErrorHandler() gin.HandlerFunc {
 			Code:    http.StatusInternalServerError,
 			Message: c.Errors.String(),
 		}
-		logger.Errorf("http global error msg: %s\n", errorToString(c.Errors.String()))
+		logger.Errorf("中间件全局Error捕获: %s\n", errorToString(c.Errors.String()))
 		infra_gin.ApiResponseError(c, response)
 		c.Abort()
 	}

@@ -13,7 +13,9 @@ type Page struct {
 
 type PageResult[T schema.Tabler] struct {
 	Page
-	Records []T `json:"records"`
+	Total   int64 `json:"total"` // 总条数
+	Pages   int   `json:"pages"` // 总页数
+	Records []T   `json:"records"`
 }
 
 func (p *Page) Offset() int {

@@ -31,14 +31,16 @@ func errorToString(r interface{}) string {
 func globalPanicHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {
-			if r := recover(); r != nil {
-				var response = infra_gin.Response[any]{
-					Code:    http.StatusInternalServerError,
-					Message: errorToString(r),
-				}
-				logger.Errorf("http global panic msg: %s\n", errorToString(r))
-				infra_gin.ApiResponseError(c, response)
+			r := recover()
+			if r == nil {
+				return
 			}
+			var response = infra_gin.Response[any]{
+				Code:    http.StatusInternalServerError,
+				Message: errorToString(r),
+			}
+			logger.Errorf("http global panic msg: %s\n", errorToString(r))
+			infra_gin.ApiResponseError(c, response)
 		}()
 		c.Next()
 	}
@@ -47,15 +49,16 @@ func globalPanicHandler() gin.HandlerFunc {
 func globalErrorHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Next()
-		if len(c.Errors) > 0 {
-			var response = infra_gin.Response[any]{
-				Code:    http.StatusInternalServerError,
-				Message: c.Errors.String(),
-			}
-			logger.Errorf("http global error msg: %s\n", errorToString(c.Errors.String()))
-			infra_gin.ApiResponseError(c, response)
-			c.Abort()
+		if len(c.Errors) <= 0 {
 			return
 		}
+
+		var response = infra_gin.Response[any]{
+			Code:    http.StatusInternalServerError,
+			Message: c.Errors.String(),
+		}
+		logger.Errorf("http global error msg: %s\n", errorToString(c.Errors.String()))
+		infra_gin.ApiResponseError(c, response)
+		c.Abort()
 	}
 }

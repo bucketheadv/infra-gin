@@ -30,9 +30,7 @@ func Page[T schema.Tabler](db *gorm.DB, page infra_gin.Page) (infra_gin.PageResu
 		return infra_gin.PageResult[T]{}, err
 	}
 
-	defer func(rows *sql.Rows) {
-		_ = rows.Close()
-	}(rows)
+	defer CloseRows(rows)
 
 	var total int64
 	tx.Count(&total)

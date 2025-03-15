@@ -16,27 +16,40 @@ func RegErrorHandler(e *gin.Engine) {
 			Code:    http.StatusNotFound,
 			Message: http.StatusText(http.StatusNotFound),
 		}
-		api.ApiResponseError(c, response)
+		api.ResponseError(c, response, http.StatusNotFound)
 	})
 }
 
-func resolveCodeError(r any) api.BizError {
+func resolveCodeError(r any) (api.BizError, int) {
 	switch v := r.(type) {
 	case error:
-		var e *api.BizError
-		if errors.As(v, &e) {
-			return *e
-		}
-		return api.BizError{
-			Code:    http.StatusInternalServerError,
-			Message: v.Error(),
-		}
+		return resolveErrorType(v)
 	default:
 		return api.BizError{
 			Code:    http.StatusInternalServerError,
 			Message: v.(string),
-		}
+		}, http.StatusInternalServerError
 	}
+}
+
+func resolveErrorType(r error) (api.BizError, int) {
+	var e *api.BizError
+	if errors.As(r, &e) {
+		return *e, http.StatusOK
+	}
+
+	var e2 *api.ParamError
+	if errors.As(r, &e2) {
+		return api.BizError{
+			Code:    http.StatusBadRequest,
+			Message: e2.Message,
+		}, http.StatusBadRequest
+	}
+
+	return api.BizError{
+		Code:    http.StatusInternalServerError,
+		Message: r.Error(),
+	}, http.StatusOK
 }
 
 func globalPanicHandler() gin.HandlerFunc {
@@ -46,13 +59,13 @@ func globalPanicHandler() gin.HandlerFunc {
 			if r == nil {
 				return
 			}
-			var err = resolveCodeError(r)
+			var err, httpStatus = resolveCodeError(r)
 			var response = api.Response[any]{
 				Code:    err.Code,
 				Message: err.Message,
 			}
 			logger.Errorf("中间件全局Panic捕获: %s\n", err.Message)
-			api.ApiResponseError(c, response)
+			api.ResponseError(c, response, httpStatus)
 		}()
 		c.Next()
 	}
@@ -65,13 +78,13 @@ func globalErrorHandler() gin.HandlerFunc {
 			return
 		}
 
-		var err = resolveCodeError(c.Errors[0])
+		var err, httpStatus = resolveCodeError(c.Errors[0])
 		var response = api.Response[any]{
 			Code:    err.Code,
 			Message: c.Errors.String(),
 		}
 		logger.Errorf("中间件全局Error捕获: %s\n", c.Errors.String())
-		api.ApiResponseError(c, response)
+		api.ResponseError(c, response, httpStatus)
 		c.Abort()
 	}
 }

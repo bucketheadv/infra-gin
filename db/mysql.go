@@ -28,7 +28,7 @@ func Page[T schema.Tabler](db *gorm.DB, page infra_gin.Page) (infra_gin.PageResu
 	tx.Find(&data)
 
 	var total int64
-	tx.Count(&total)
+	db.Count(&total)
 	var totalInt = (int)(total)
 	var pages = 0
 	if totalInt%page.PageSize == 0 {

@@ -1,6 +1,7 @@
 package db
 
 import (
+	"cmp"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -71,18 +72,20 @@ func SetCache(redisClient *redis.Client, key string, value any, ttl time.Duratio
 	return nil
 }
 
-type TablerWithID interface {
+type IdType = cmp.Ordered
+
+type TablerWithID[T cmp.Ordered] interface {
 	TableName() string
-	ID() any
+	GetID() T
 }
 
-func GetModelCaches[T TablerWithID](client *redis.Client, cacheKeyFormat string, ids []any, expires time.Duration, fallback func(missingIds []any) *gorm.DB) ([]T, error) {
+func GetModelCaches[T TablerWithID[R], R cmp.Ordered](client *redis.Client, cacheKeyFormat string, ids []R, expires time.Duration, fallback func(missingIds []R) *gorm.DB) ([]T, error) {
 	if len(ids) == 0 {
 		return make([]T, 0), nil
 	}
 
 	var result = make([]T, 0)
-	var missingIds = make([]any, 0)
+	var missingIds = make([]R, 0)
 	var keys = make([]string, 0)
 	for _, id := range ids {
 		var key = fmt.Sprintf(cacheKeyFormat, id)
@@ -90,11 +93,11 @@ func GetModelCaches[T TablerWithID](client *redis.Client, cacheKeyFormat string,
 	}
 	foundModels, err := GetCaches[T](client, keys)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-	var foundModelIds = make([]any, 0)
+	var foundModelIds = make([]R, 0)
 	for _, u := range foundModels {
-		foundModelIds = append(foundModelIds, u.ID())
+		foundModelIds = append(foundModelIds, u.GetID())
 		result = append(result, u)
 	}
 	for _, id := range ids {
@@ -107,7 +110,7 @@ func GetModelCaches[T TablerWithID](client *redis.Client, cacheKeyFormat string,
 		var models []T
 		fallback(missingIds).Find(&models)
 		for _, model := range models {
-			var key = fmt.Sprintf(cacheKeyFormat, model.ID)
+			var key = fmt.Sprintf(cacheKeyFormat, model.GetID())
 			err := SetCache(client, key, model, expires)
 			if err != nil {
 				panic(err)

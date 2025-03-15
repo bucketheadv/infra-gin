@@ -3,7 +3,7 @@ package db
 import (
 	"database/sql"
 	"github.com/bucketheadv/infra-core/modules/logger"
-	"github.com/bucketheadv/infra-gin"
+	"github.com/bucketheadv/infra-gin/api"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
@@ -22,7 +22,7 @@ func NewMySQL(config MySQLConf, gormConfig *gorm.Config) *gorm.DB {
 	return DB
 }
 
-func Page[T schema.Tabler](tx *gorm.DB, page infra_gin.Page) (infra_gin.PageResult[T], error) {
+func Page[T schema.Tabler](tx *gorm.DB, page api.Page) (api.PageResult[T], error) {
 	var data []T
 	var model T
 	var total int64
@@ -35,7 +35,7 @@ func Page[T schema.Tabler](tx *gorm.DB, page infra_gin.Page) (infra_gin.PageResu
 	} else {
 		pages = totalInt/page.PageSize + 1
 	}
-	return infra_gin.PageResult[T]{
+	return api.PageResult[T]{
 		Page:    page,
 		Pages:   pages,
 		Total:   total,

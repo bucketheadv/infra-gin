@@ -1,4 +1,4 @@
-package infra_gin
+package api
 
 import (
 	"cmp"

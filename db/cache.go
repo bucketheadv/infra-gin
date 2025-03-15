@@ -3,8 +3,11 @@ package db
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/go-redis/redis/v8"
+	"gorm.io/gorm"
 	"reflect"
+	"slices"
 	"time"
 )
 
@@ -66,4 +69,51 @@ func SetCache(redisClient *redis.Client, key string, value any, ttl time.Duratio
 		return result.Err()
 	}
 	return nil
+}
+
+type TablerWithID interface {
+	TableName() string
+	ID() any
+}
+
+func GetModelCaches[T TablerWithID](client *redis.Client, cacheKeyFormat string, ids []any, expires time.Duration, fallback func(missingIds []any) *gorm.DB) ([]T, error) {
+	if len(ids) == 0 {
+		return make([]T, 0), nil
+	}
+
+	var result = make([]T, 0)
+	var missingIds = make([]any, 0)
+	var keys = make([]string, 0)
+	for _, id := range ids {
+		var key = fmt.Sprintf(cacheKeyFormat, id)
+		keys = append(keys, key)
+	}
+	foundModels, err := GetCaches[T](client, keys)
+	if err != nil {
+		panic(err)
+	}
+	var foundModelIds = make([]any, 0)
+	for _, u := range foundModels {
+		foundModelIds = append(foundModelIds, u.ID())
+		result = append(result, u)
+	}
+	for _, id := range ids {
+		if !slices.Contains(foundModelIds, id) {
+			missingIds = append(missingIds, id)
+		}
+	}
+
+	if len(missingIds) > 0 {
+		var models []T
+		fallback(missingIds).Find(&models)
+		for _, model := range models {
+			var key = fmt.Sprintf(cacheKeyFormat, model.ID)
+			err := SetCache(client, key, model, expires)
+			if err != nil {
+				panic(err)
+			}
+			result = append(result, model)
+		}
+	}
+	return result, nil
 }

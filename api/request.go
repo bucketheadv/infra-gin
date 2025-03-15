@@ -15,13 +15,11 @@ func GetQuery[T cmp.Ordered](c *gin.Context, key string) (T, error) {
 	var v T
 	q, success := c.GetQuery(key)
 	if !success {
-		var e = ErrParamInvalid.Format(key)
-		return v, &e
+		return v, ErrParamInvalid.Format(key)
 	}
 
 	if q == "" {
-		var e = ErrParamBlank.Format(key)
-		return v, &e
+		return v, ErrParamBlank.Format(key)
 	}
 
 	v, err := basic.StringTo[T](q)

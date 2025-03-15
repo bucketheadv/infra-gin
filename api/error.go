@@ -21,11 +21,14 @@ type ParamError struct {
 }
 
 func (e *ParamError) Error() string {
-	return fmt.Sprintf(e.Message, e.Fields)
+	if len(e.Fields) > 0 {
+		return fmt.Sprintf(e.Message, e.Fields)
+	}
+	return e.Message
 }
 
-func (e *ParamError) Format(fields ...string) ParamError {
-	return ParamError{
+func (e *ParamError) Format(fields ...string) *ParamError {
+	return &ParamError{
 		Fields:  fields,
 		Message: e.Message,
 	}

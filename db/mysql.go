@@ -22,13 +22,12 @@ func NewMySQL(config MySQLConf, gormConfig *gorm.Config) *gorm.DB {
 	return DB
 }
 
-func Page[T schema.Tabler](db *gorm.DB, page infra_gin.Page) (infra_gin.PageResult[T], error) {
-	var tx = db.Offset(page.Offset()).Limit(page.Limit())
+func Page[T schema.Tabler](tx *gorm.DB, page infra_gin.Page) (infra_gin.PageResult[T], error) {
 	var data []T
-	tx.Find(&data)
-
+	var model T
 	var total int64
-	db.Count(&total)
+	tx.Model(model).Count(&total).Offset(page.Offset()).Limit(page.Limit()).Find(&data)
+
 	var totalInt = (int)(total)
 	var pages = 0
 	if totalInt%page.PageSize == 0 {

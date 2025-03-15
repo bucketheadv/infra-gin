@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"errors"
 	"github.com/bucketheadv/infra-core/modules/logger"
 	"github.com/bucketheadv/infra-gin/api"
 	"github.com/gin-gonic/gin"
@@ -19,12 +20,22 @@ func RegErrorHandler(e *gin.Engine) {
 	})
 }
 
-func errorToString(r interface{}) string {
+func resolveCodeError(r any) api.BizError {
 	switch v := r.(type) {
 	case error:
-		return v.Error()
+		var e *api.BizError
+		if errors.As(v, &e) {
+			return *e
+		}
+		return api.BizError{
+			Code:    http.StatusInternalServerError,
+			Message: v.Error(),
+		}
 	default:
-		return v.(string)
+		return api.BizError{
+			Code:    http.StatusInternalServerError,
+			Message: v.(string),
+		}
 	}
 }
 
@@ -35,11 +46,12 @@ func globalPanicHandler() gin.HandlerFunc {
 			if r == nil {
 				return
 			}
+			var err = resolveCodeError(r)
 			var response = api.Response[any]{
-				Code:    http.StatusInternalServerError,
-				Message: errorToString(r),
+				Code:    err.Code,
+				Message: err.Message,
 			}
-			logger.Errorf("中间件全局Panic捕获: %s\n", errorToString(r))
+			logger.Errorf("中间件全局Panic捕获: %s\n", err.Message)
 			api.ApiResponseError(c, response)
 		}()
 		c.Next()
@@ -53,11 +65,12 @@ func globalErrorHandler() gin.HandlerFunc {
 			return
 		}
 
+		var err = resolveCodeError(c.Errors[0])
 		var response = api.Response[any]{
-			Code:    http.StatusInternalServerError,
+			Code:    err.Code,
 			Message: c.Errors.String(),
 		}
-		logger.Errorf("中间件全局Error捕获: %s\n", errorToString(c.Errors.String()))
+		logger.Errorf("中间件全局Error捕获: %s\n", c.Errors.String())
 		api.ApiResponseError(c, response)
 		c.Abort()
 	}

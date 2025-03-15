@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/go-redis/redis/v8"
 	"gorm.io/gorm"
+	"gorm.io/gorm/schema"
 	"reflect"
 	"slices"
 	"time"
@@ -73,11 +74,11 @@ func SetCache(redisClient *redis.Client, key string, value any, ttl time.Duratio
 }
 
 type TableWithID[T cmp.Ordered] interface {
-	TableName() string
+	schema.Tabler
 	GetID() T
 }
 
-func GetModelCaches[T TableWithID[R], R cmp.Ordered](client *redis.Client, cacheKeyFormat string, ids []R, expires time.Duration, fallback func(missingIds []R) *gorm.DB) ([]T, error) {
+func ModelCaches[T TableWithID[R], R cmp.Ordered](client *redis.Client, cacheKeyFormat string, ids []R, expires time.Duration, fallback func(missingIds []R) *gorm.DB) ([]T, error) {
 	if len(ids) == 0 {
 		return make([]T, 0), nil
 	}

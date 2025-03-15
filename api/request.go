@@ -2,14 +2,14 @@ package api
 
 import (
 	"cmp"
-	"errors"
 	"github.com/bucketheadv/infra-core/basic"
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 var (
-	ErrParamInvalid = errors.New("参数错误")
-	ErrParamBlank   = errors.New("参数为空")
+	ErrParamInvalid = NewError(http.StatusBadRequest, "参数错误")
+	ErrParamBlank   = NewError(http.StatusBadRequest, "参数为空")
 )
 
 func GetQuery[T cmp.Ordered](c *gin.Context, key string) (T, error) {

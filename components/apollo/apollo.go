@@ -19,7 +19,7 @@ func (c *apolloChangeListener) OnChange(event *storage.ChangeEvent) {
 }
 
 func (c *apolloChangeListener) OnNewestChange(event *storage.FullChangeEvent) {
-	logger.Infof("Apollo拉取, 命名空间 [%s] 已更新到最新版本", event.Namespace)
+	logger.Infof("Apollo命名空间 [%s] 已更新到最新版本", event.Namespace)
 }
 
 type Conf struct {

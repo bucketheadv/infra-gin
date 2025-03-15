@@ -22,7 +22,11 @@ type ParamError struct {
 
 func (e *ParamError) Error() string {
 	if len(e.Fields) > 0 {
-		return fmt.Sprintf(e.Message, e.Fields)
+		var fields = make([]any, 0)
+		for _, field := range e.Fields {
+			fields = append(fields, field)
+		}
+		return fmt.Sprintf(e.Message, fields...)
 	}
 	return e.Message
 }

@@ -2,7 +2,6 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm/schema"
 	"strconv"
 )
 
@@ -11,7 +10,7 @@ type Page struct {
 	PageSize int `json:"pageSize"`
 }
 
-type PageResult[T schema.Tabler] struct {
+type PageResult[T any] struct {
 	Page
 	Total   int64 `json:"total"` // 总条数
 	Pages   int   `json:"pages"` // 总页数

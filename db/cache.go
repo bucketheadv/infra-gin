@@ -72,14 +72,12 @@ func SetCache(redisClient *redis.Client, key string, value any, ttl time.Duratio
 	return nil
 }
 
-type IdType = cmp.Ordered
-
-type TablerWithID[T cmp.Ordered] interface {
+type TableWithID[T cmp.Ordered] interface {
 	TableName() string
 	GetID() T
 }
 
-func GetModelCaches[T TablerWithID[R], R cmp.Ordered](client *redis.Client, cacheKeyFormat string, ids []R, expires time.Duration, fallback func(missingIds []R) *gorm.DB) ([]T, error) {
+func GetModelCaches[T TableWithID[R], R cmp.Ordered](client *redis.Client, cacheKeyFormat string, ids []R, expires time.Duration, fallback func(missingIds []R) *gorm.DB) ([]T, error) {
 	if len(ids) == 0 {
 		return make([]T, 0), nil
 	}

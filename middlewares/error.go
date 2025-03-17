@@ -65,7 +65,7 @@ func globalPanicHandler() gin.HandlerFunc {
 				Message: err.Message,
 			}
 			logger.Errorf("中间件全局Panic捕获: %s\n", err.Message)
-			api.ResponseError(c, response, httpStatus)
+			c.AbortWithStatusJSON(httpStatus, response)
 		}()
 		c.Next()
 	}
@@ -84,7 +84,6 @@ func globalErrorHandler() gin.HandlerFunc {
 			Message: c.Errors.String(),
 		}
 		logger.Errorf("中间件全局Error捕获: %s\n", c.Errors.String())
-		api.ResponseError(c, response, httpStatus)
-		c.Abort()
+		c.AbortWithStatusJSON(httpStatus, response)
 	}
 }

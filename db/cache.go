@@ -107,7 +107,10 @@ func ModelCaches[T TableWithID[R], R cmp.Ordered](client *redis.Client, cacheKey
 
 	if len(missingIds) > 0 {
 		var models []T
-		fallback(missingIds).Find(&models)
+		err = fallback(missingIds).Find(&models).Error
+		if err != nil {
+			return nil, err
+		}
 		for _, model := range models {
 			var key = fmt.Sprintf(cacheKeyFormat, model.GetID())
 			err := SetCache(client, key, model, expires)

@@ -26,7 +26,10 @@ func Page[T schema.Tabler](tx *gorm.DB, page api.Page) (api.PageResult[T], error
 	var data []T
 	var model T
 	var total int64
-	tx.Model(model).Count(&total).Offset(page.Offset()).Limit(page.Limit()).Find(&data)
+	var err = tx.Model(model).Count(&total).Offset(page.Offset()).Limit(page.Limit()).Find(&data).Error
+	if err != nil {
+		return api.PageResult[T]{}, err
+	}
 
 	var totalInt = (int)(total)
 	var pages = 0
